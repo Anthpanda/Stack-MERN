@@ -1,29 +1,31 @@
-export const getNotes = (req, res) => {
-    res.json({
-        message: 'Get - Users Routes'
-    });
+import Notes from '../models/Note';
+
+export const getNotes = async (req, res) => {
+    const notes = await Notes.find();
+    res.json(notes);
 }
 
 export const getNotesById = (req, res) => {
     res.json({
-        message: 'Get - Users Routes by id'
+        message: 'Get - Users Notes Routes by id'
     });
 }
 
 export const createNotes = (req, res) => {
+    console.log(req.body)
     res.json({
-        message: 'Post - Users Routes'
+        message: 'Note Saved'
     });
 }
 
-export const deleteNotes = (req, res) => {
+export const deleteNote = (req, res) => {
     res.json({
-        message: 'Note - Deleted'
+        message: 'User - Deleted'
     });
 }
 
-export const updateNotes = (req, res) => {
+export const updateNote = (req, res) => {
     res.json({
-        message: 'Note -updated'
+        message: 'User -updated'
     });
 }
