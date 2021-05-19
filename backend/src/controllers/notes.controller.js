@@ -1,31 +1,49 @@
-import Notes from '../models/Note';
+import Note from '../models/Note';
 
 export const getNotes = async (req, res) => {
-    const notes = await Notes.find();
+    const notes = await Note.find();
     res.json(notes);
 }
 
-export const getNotesById = (req, res) => {
-    res.json({
-        message: 'Get - Users Notes Routes by id'
-    });
+export const getNotesById = async (req, res) => {
+    const note = await Note.findById(req.params.id);
+    res.json(note);
 }
 
-export const createNotes = (req, res) => {
-    console.log(req.body)
+export const createNotes = async (req, res) => {
+
+    const {title, content, date, author } = req.body;
+
+    const newNote = new Note({
+        title,
+        content,
+        author,
+        date
+    });
+
+    await newNote.save();
+
     res.json({
         message: 'Note Saved'
     });
 }
 
-export const deleteNote = (req, res) => {
+export const deleteNote = async (req, res) => {
+    await Note.findOneAndDelete({_id:req.params.id})
     res.json({
-        message: 'User - Deleted'
+        message: 'Note - Deleted'
     });
 }
 
-export const updateNote = (req, res) => {
+export const updateNote = async (req, res) => {
+    const {title, content, author } = req.body;
+    await Note.findOneAndUpdate({_id:req.params.id}, {
+        title,
+        content,
+        author
+    });
+
     res.json({
-        message: 'User -updated'
+        message: 'Note - updated'
     });
 }
