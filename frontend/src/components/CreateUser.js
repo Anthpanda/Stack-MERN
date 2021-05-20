@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 
 export default function CreateUser() {
-
-    const [dataUsers, setDataUsers] = useState({ users: [] });
-    const [username, setusername] = useState('')
+    const [state, setstate] = useState({
+        dataUsers: [],
+        username: ''
+    });
 
     useEffect(() => {
         getUsers();
@@ -12,21 +13,22 @@ export default function CreateUser() {
 
     const getUsers = async () => {
         const res = await axios.get('http://localhost:4000/api/users');
-        setDataUsers({ users: res.data });
+        setstate(prevState => ({...prevState, dataUsers : res.data}));
     };
 
     const onChangeUsername = (e) => {
-        setusername(e.target.value);
+        setstate((prevState => ({...prevState,username:e.target.value})));
     }
 
     const onSubmit = async e => {
         e.preventDefault();
+        const {username} = state;
         await axios.post('http://localhost:4000/api/users', {
             username
         });
 
         getUsers();
-        setusername('');
+        setstate((prevState => ({...prevState, username:''})));
 
     }
 
@@ -45,7 +47,7 @@ export default function CreateUser() {
                             <input
                                 type="text"
                                 className="form-control"
-                                value={username}
+                                value={state.username}
                                 onChange={onChangeUsername}
 
                             />
@@ -59,7 +61,7 @@ export default function CreateUser() {
             <div className="col-md-8">
                 <ul className="list-group">
                     {
-                        dataUsers.users.map(item => <li
+                        state.dataUsers.map(item => <li
                             key={item._id}
                             onDoubleClick ={()=> deleteUser(item._id)}
                             className=" list-group-item list-group-item-action">
