@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export default function CreateUser() {
@@ -8,8 +8,10 @@ export default function CreateUser() {
     });
 
     useEffect(() => {
+        
         getUsers();
-    }, []);
+
+    },[]);
 
     const getUsers = async () => {
         const res = await axios.get('http://localhost:4000/api/users');
@@ -32,9 +34,9 @@ export default function CreateUser() {
 
     }
 
-    const deleteUser = async _id =>{
+    const deleteUser = async _id => {
         await axios.delete('http://localhost:4000/api/users/'+ _id);
-        getUsers()
+        getUsers();
     }
 
     return (

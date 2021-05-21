@@ -3,47 +3,56 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'
 
-export default function CreateNote() {
+export default function CreateNote(props) {
     const [state, setstate] = useState({
         userSelected: '',
         title: '',
         content: '',
         usersData: [],
-        date: new Date()
+        date: new Date(),
+        editing:false,
+        _id:''
     });
 
     useEffect(() => {
+        const getUsers = async () => {
+
+            const result = await axios.get('http://localhost:4000/api/users');
+            const usersData = result.data.map(user => user.username);
+            const userSelected = usersData[0];
+            const editing = props.match.params.id? true : false;
+            const _id = editing? props.match.params.id : '';
+            setstate(prevState => ({ ...prevState, userSelected ,usersData,editing, _id}));
+    
+        }
 
         getUsers();
 
-    }, [])
+    }, [props.match.params.id]);
+    
 
-    const getUsers = async () => {
-        const result = await axios.get('http://localhost:4000/api/users');
-        const usersData = result.data.map(user => user.username);
-        const userSelected = usersData[0];
-        setstate(prevState => ({ ...prevState, userSelected ,usersData }));
-
-    }
 
     const onsubmit = async (e) => {
-        e.preventDefault();
-
         const newNote = {
             title: state.title,
             content: state.content,
             date: state.date,
             author: state.userSelected
         }
-         await axios.post('http://localhost:4000/api/notes', newNote);
+
+        if (state.editing) {
+            await axios.put(`http://localhost:4000/api/note${state._id}`, newNote);
+        }
+        else{
+            await axios.post('http://localhost:4000/api/notes', newNote);
+        }
+        e.preventDefault();
         window.location.href = '/';
-
-
     }
 
     const onInputChange = (e) => {
         const { name, value } = e.target;
-        setstate(prevState => ({ ...prevState, [name]: value }))
+        setstate(prevState => ({...prevState,[name]: value }))
 
     }
 
