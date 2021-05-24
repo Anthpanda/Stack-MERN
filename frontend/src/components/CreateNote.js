@@ -4,46 +4,63 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'
 
 export default function CreateNote(props) {
+
     const [state, setstate] = useState({
         userSelected: '',
         title: '',
         content: '',
         usersData: [],
         date: new Date(),
-        editing:false,
-        _id:''
+        editing: false,
+        _id: ''
     });
 
+    const { id } = props.match.params
+
     useEffect(() => {
+
         const getUsers = async () => {
 
             const result = await axios.get('http://localhost:4000/api/users');
             const usersData = result.data.map(user => user.username);
             const userSelected = usersData[0];
-            const editing = props.match.params.id? true : false;
-            const _id = editing? props.match.params.id : '';
-            setstate(prevState => ({ ...prevState, userSelected ,usersData,editing, _id}));
-    
-        }
+            setstate(prevState => ({ ...prevState, userSelected, usersData }));
+
+            if (id) {
+                const result = await axios.get(`http://localhost:4000/api/notes/${id}`);
+  
+                setstate(prevState => ({
+
+                    ...prevState,
+                    title: result.data.title,
+                    userSelected: result.data.author,
+                    content: result.data.content,
+                    date: new Date(result.data.date),
+                    editing: true,
+                    _id: id
+
+                }));
+            };
+        };
 
         getUsers();
 
-    }, [props.match.params.id]);
-    
+    }, [id]);
 
 
     const onsubmit = async (e) => {
+
         const newNote = {
             title: state.title,
             content: state.content,
             date: state.date,
             author: state.userSelected
-        }
+        };
 
         if (state.editing) {
-            await axios.put(`http://localhost:4000/api/note${state._id}`, newNote);
+            await axios.put(`http://localhost:4000/api/notes/${state._id}`, newNote);
         }
-        else{
+        else {
             await axios.post('http://localhost:4000/api/notes', newNote);
         }
         e.preventDefault();
@@ -52,7 +69,7 @@ export default function CreateNote(props) {
 
     const onInputChange = (e) => {
         const { name, value } = e.target;
-        setstate(prevState => ({...prevState,[name]: value }))
+        setstate(prevState => ({ ...prevState, [name]: value }))
 
     }
 
@@ -73,7 +90,7 @@ export default function CreateNote(props) {
                         value={state.userSelected}
                     >
                         {
-                            state.usersData.map(user => <option key={user} value={user} >
+                            state.usersData.map(user => <option key={user} value={user}>
                                 {user}
                             </option>)
                         }
